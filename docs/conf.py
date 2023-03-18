@@ -145,9 +145,10 @@ html_theme_options = {
     "navbar_align": "left",  # [left, content, right] For testing that the navbar items align properly
     "navbar_center": ["version-switcher", "navbar-nav"],
     "announcement": "https://raw.githubusercontent.com/pydata/pydata-sphinx-theme/main/docs/_templates/custom-template.html",
-    # "navigation_startdepth": 0,
-    # "toc_caption_maxdepth": 3,
-    # "show_nav_level": 2,
+    "navigation_startdepth": 0,
+    "navigation_depth": 8,
+    "toc_caption_maxdepth": 4,
+    "show_nav_level": 0,
     # "navbar_start": ["navbar-logo"],
     # "navbar_end": ["theme-switcher", "navbar-icon-links"],
     # "navbar_persistent": ["search-button"],

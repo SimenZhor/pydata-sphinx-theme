@@ -517,7 +517,6 @@ def add_toctree_functions(app, pagename, templatename, context, doctree):
             if show_nav_level == 0:
                 partcaptions = soup.find_all("p", attrs={"class": "caption"})
                 if len(partcaptions):
-                    new_soup = bs("<ul class='list-caption'></ul>", "html.parser")
                     for caption in partcaptions:
                         # Assume that the next <ul> element is the TOC list
                         # for this part
@@ -525,10 +524,26 @@ def add_toctree_functions(app, pagename, templatename, context, doctree):
                             if sibling.name == "ul":
                                 toclist = sibling
                                 break
-                        li = soup.new_tag("li", attrs={"class": "toctree-l0"})
-                        li.extend([caption, toclist])
-                        new_soup.ul.append(li)
-                    soup = new_soup
+                        
+                        i_caption = caption.parent.index(caption)
+
+                        list_items = toclist.select('[class*="toctree-l"]')
+                        if list_items:
+                            # Find toctree-level of first child item. Place the caption 1 level above
+                            first_item = list_items[0]
+                            classes = first_item.attrs["class"]
+                            for c in classes:
+                                if c.startswith("toctree-l"):
+                                    level = c.replace("toctree-l", "")
+                                    try:
+                                        level = int(level) - 1
+                                    except ValueError:
+                                        # Class name contains more than just toctree-l{level}
+                                        level = 0
+
+                        li = soup.new_tag("li", attrs={"class": f"toctree-l{level}"})
+                        caption.parent.insert(i_caption,li)
+                        li.extend([caption, toclist]) # This line moves caption and toclist (as opposed to copies)
 
             # Add icons and labels for collapsible nested sections
             _add_collapse_checkboxes(soup)
@@ -1021,7 +1036,7 @@ def _resolve(self: TocTree, docname: str, builder: "Builder", toctree: addnodes.
                 else:
                     children = cast(Iterable[nodes.Element], toc)
                     entries.extend(children)
-        if not subtree and not separate:
+        if depth <= toc_caption_maxdepth or (not subtree and not separate):
             ret = nodes.bullet_list()
             ret += entries
             return [ret]
