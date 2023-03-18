@@ -541,7 +541,7 @@ def add_toctree_functions(app, pagename, templatename, context, doctree):
                                         # Class name contains more than just toctree-l{level}
                                         level = 0
 
-                        li = soup.new_tag("li", attrs={"class": f"toctree-l{level}"})
+                        li = soup.new_tag("li", attrs={"class": f"toctree-l{level} collapsible-caption"})
                         caption.parent.insert(i_caption,li)
                         li.extend([caption, toclist]) # This line moves caption and toclist (as opposed to copies)
 
@@ -683,6 +683,13 @@ def _add_collapse_checkboxes(soup):
         # (by checking the checkbox)
         if "current" in classes:
             checkbox.attrs["checked"] = ""
+
+        if "collapsible-caption" in classes:
+            for item in element.find("ul"):
+                if item.name == "li":
+                    if "current" in item.get("class", []):
+                        checkbox.attrs["checked"] = ""
+                        break
 
         element.insert(1, checkbox)
 
